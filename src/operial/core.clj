@@ -12,17 +12,29 @@
 
 (def space 10)
 
+(defn check [w h c1 c2]
+  (let [c2-tl (c2 9)
+        c1-top (c1 0)
+        c1-br (c1 3)
+        c2-bot (c2 5)]
+    {:c2-tl (coords-based-on w h c2-tl)
+     :c1-top (coords-based-on w h c1-top)
+     :c1-br (coords-based-on w h c1-br)
+     :c2-bot (coords-based-on w h c2-bot)}
+  ))
+
 (defn coords-based-on [width height [x y label]]
   (let [half-width (/ width 2)
         quarter-height (/ height 4)
-        three-quarters-height (* 3 quarter-height)]
+        three-quarters-height (* 3 quarter-height)
+        half-space (/ space 2)]
       (case label
-        :top [(+ x (/ width 2) (/ space 2)) (- y (* 3 (/ height 4)) space)]
-        :top-right [(+ x (/ width 2) space) (- y (/ height 4))]
-        :bottom-right [(+ x (/ space 2)) (+ y space)]
-        :bottom [(- x (/ width 2) (/ space 2)) y]
-        :bottom-left [(- x (/ width 2) space) (- y (* 3 (/ height 4)))]
-        :top-left [(- x (/ space 2)) (- y height space)]
+        :top [(+ x half-width half-space) (- y three-quarters-height space)]
+        :top-right [(+ x half-width space) (- y (/ height 4))] ; (- y (/ height 4))
+        :bottom-right [(+ x half-space) (+ y space)]
+        :bottom [(- x half-width half-space) (- y (- (/ height 4) space))]
+        :bottom-left [(- x half-width space) (- y three-quarters-height)]
+        :top-left [(- x half-space) (- y height space)]
       )
     )
   )
@@ -87,12 +99,42 @@
     )
   (q/end-shape))
 
+(defn debug [w h]
+  (let [first-hex (hexagon-points w h 400 300)
+  [tx ty] (coords-based-on w h (first-hex 0))
+  top (hexagon-points w h tx ty)
+  [tr-x tr-y] (coords-based-on w h (first-hex 1))
+  top-right (hexagon-points w h tr-x tr-y)
+  [br-x br-y] (coords-based-on w h (first-hex 3))
+  bot-right (hexagon-points w h br-x br-y)
+  [bx by] (coords-based-on w h (first-hex 5))
+  bot (hexagon-points w h bx by)
+  [bl-x bl-y] (coords-based-on w h (first-hex 7))
+  bot-left (hexagon-points w h bl-x bl-y)
+  [tl-x tl-y] (coords-based-on w h (first-hex 9))
+  top-left (hexagon-points w h tl-x tl-y)]
+  (q/stroke 255 255 255)
+  (draw-shape first-hex)
+  (q/stroke 255 0 0)
+  (draw-shape top)
+  (q/stroke 0 255 0)
+  (draw-shape top-right)
+  (q/stroke 0 0 255)
+  (draw-shape bot-right)
+  (q/stroke 255 255 0)
+  (draw-shape bot)
+  (q/stroke 255 0 255)
+  (draw-shape bot-left)
+  (q/stroke 0 255 255)
+  (draw-shape top-left)
+  ))
+
 (defn hex-cluster [width height points count]
   (if (zero? count) nil
     (let [[next-x next-y] (coords-based-on width height (rand-nth points))
           second (hexagon-points width height next-x next-y)]
       (q/blend-mode :add)
-      (q/stroke-weight (rand-nth [1 2 3 4 5 6]))
+      (q/stroke-weight (rand-nth [1 2 3 4 5 6 7]))
       (draw-shape second)
       (recur width height second (dec count)))))
 
@@ -100,13 +142,15 @@
   (q/background 0)
   (q/stroke-weight 1)
   (q/stroke 70 80 110 128)
-  (q/fill 170 180 235)
+  (q/fill 235 180 170 200)
   (q/ellipse 400 300 100 100)
-  (q/with-translation [400 300]
-    (hexagon 100 110))
-  (let [first-hex (hexagon-points 36 40 (state :start-x) (state :start-y))]
-    (hex-cluster 36 40 first-hex 120)))
-
+  ;(q/with-translation [400 300]
+  ;  (hexagon 100 110))
+  (let [first-hex (hexagon-points 36 40 (state :start-x) (state :start-y))
+        bigger-hex (hexagon-points 72 80 (q/random 800) (q/random 600))]
+    (hex-cluster 36 40 first-hex 100)
+    (hex-cluster 72 80 bigger-hex 15)
+    ))
 
 (q/defsketch operial
   :title "Operial"
