@@ -91,17 +91,19 @@
   (if (zero? count) nil
     (let [[next-x next-y] (coords-based-on width height (rand-nth points))
           second (hexagon-points width height next-x next-y)]
+      (q/blend-mode :add)
+      (q/stroke-weight (rand-nth [1 2 3 4 5 6]))
       (draw-shape second)
       (recur width height second (dec count)))))
 
 (defn draw-state [state]
-  (q/background 253)
+  (q/background 0)
   (q/stroke-weight 1)
+  (q/stroke 70 80 110 128)
   (q/fill 170 180 235)
   (q/ellipse 400 300 100 100)
   (q/with-translation [400 300]
     (hexagon 100 110))
-  (q/stroke-weight 2)
   (let [first-hex (hexagon-points 36 40 (state :start-x) (state :start-y))]
     (hex-cluster 36 40 first-hex 120)))
 
