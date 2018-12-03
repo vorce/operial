@@ -3,12 +3,13 @@
             [quil.middleware :as m]))
 
 (defn setup []
-  ; (q/no-loop)
+  ;(q/no-loop)
   (q/smooth)
   (q/frame-rate 1)
   ; (q/color-mode :hsb)
   {:start-x (q/random 800),
-   :start-y (q/random 600)})
+   :start-y (q/random 600)
+   :hex-size (rand-nth [[18 20] [27 30] [36 40] [54 60] [72 80]])})
 
 (def space 10)
 
@@ -64,7 +65,7 @@
   )
 
 (defn draw-shape [vertices]
-  (q/stroke-cap :project)
+  (q/stroke-cap :round)
   (q/begin-shape :lines)
   (doseq [v vertices]
     (let [x (v 0)
@@ -146,10 +147,14 @@
   (q/ellipse 400 300 150 150)
   ;(q/with-translation [400 300]
   ;  (hexagon 100 110))
-  (let [first-hex (hexagon-points 36 40 (state :start-x) (state :start-y))
-        bigger-hex (hexagon-points 72 80 (q/random 800) (q/random 600))]
-    (hex-cluster 36 40 first-hex 100)
-    (hex-cluster 72 80 bigger-hex 15)
+  (let [hex-size (state :hex-size)
+        hex-w (hex-size 0)
+        hex-h (hex-size 1)
+        first-hex (hexagon-points hex-w hex-h (state :start-x) (state :start-y))
+        ;bigger-hex (hexagon-points 72 80 (q/random 800) (q/random 600))
+        ]
+    (hex-cluster hex-w hex-h first-hex 250)
+    ;(hex-cluster 72 80 bigger-hex 15)
     ))
 
 (q/defsketch operial
