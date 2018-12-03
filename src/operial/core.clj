@@ -143,7 +143,7 @@
   (q/stroke-weight 1)
   (q/stroke 70 80 110 128)
   (q/fill 235 180 170 200)
-  (q/ellipse 400 300 100 100)
+  (q/ellipse 400 300 150 150)
   ;(q/with-translation [400 300]
   ;  (hexagon 100 110))
   (let [first-hex (hexagon-points 36 40 (state :start-x) (state :start-y))
